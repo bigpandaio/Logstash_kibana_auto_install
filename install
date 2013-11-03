@@ -8,7 +8,7 @@ ROOT=$(cd `dirname ${BASH_SOURCE[0]}` && echo $PWD)
 
 sudo add-apt-repository ppa:webupd8team/java -y
 sudo apt-get update
-sudo apt-get install -y --force-yes oracle-java7-installer rubygems ruby1.9.1-dev
+sudo apt-get install -y --force-yes oracle-java7-installer rubygems ruby1.9.1-dev unzip nginx
 
 # Install and configure elasticsearch
 wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.5.deb -O /tmp/elasticsearch.deb
@@ -27,7 +27,7 @@ sudo rm -rf LOGHOME
 sudo mkdir $LOGHOME && sudo chown -R ubuntu:ubuntu $LOGHOME
 pushd $LOGHOME
 wget http://logstash.objects.dreamhost.com/release/logstash-1.2.1-flatjar.jar -O logstash.jar
-cp $ROOT/conf/logstash_server.conf .
+cp $ROOT/conf/logstash-node.conf .
 sudo cp $ROOT/init/logstash.conf /etc/init/
 sudo mkdir /var/lib/logstash && sudo chown -R ubuntu:ubuntu /var/lib/logstash # Required working directory for logstash
 sudo service logstash start
@@ -36,25 +36,24 @@ popd
 # Install and configure the Kibana frontend
 pushd /opt/
 sudo rm -rf kibana
-sudo wget https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz
-sudo tar zxf kibana-3.0.0milestone4.tar.gz
-sudo rm kibana-3.0.0milestone4.tar.gz
-sudo mv kibana-3.0.0milestone4 kibana & sudo chown -R ubuntu:ubuntu kibana
+sudo wget sudo wget http://download.elasticsearch.org/kibana/kibana/kibana-latest.zip
+sudo unzip kibana-latest.zip
+sudo rm kibana-latest.zip
+sudo mv kibana-latest kibana
 popd
 
 # Install and configure Nginx (serves Kibana)
-sudo apt-get install nginx
 pushd /etc/nginx/sites-available
 sudo rm default
-cp $ROOT/etc/nginx/kibana .
-sudo ln -s /etc/nginx/sites-enabled/kibana /etc/nginx/sites-available/kibana
+sudo cp $ROOT/etc/nginx/kibana .
+sudo ln -s /etc/nginx/sites-available/kibana /etc/nginx/sites-enabled/kibana
 sudo service nginx reload
 popd
 
 
 # Up the open FD limit for everyone
-echo "soft nofile 1000000" >> /etc/security/limits.conf
-echo "hard nofile 1000000" >> /etc/security/limits.conf
+echo 'echo "soft nofile 1000000" >> /etc/security/limits.conf' | sudo bash
+echo 'echo "hard nofile 1000000" >> /etc/security/limits.conf' | sudo bash
 
 cat - <<FINISHED
 Installation complete. 
