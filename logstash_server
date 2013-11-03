@@ -6,20 +6,13 @@ set -e
 # Grab the fullpath of our root directory
 ROOT=$(cd `dirname ${BASH_SOURCE[0]}` && echo $PWD)
 
-apt-get update
-apt-get install -y --force-yes redis-server openjdk-7-jre-headless rubygems ruby1.9.1-dev
-
-# Redis serves as the queue for logstash logs
-sed -ie 's#bind 127.0.0.1#bind 0.0.0.0#' /etc/redis/redis.conf
-# This keeps redis background dumping from crashing if you run low
-# on system memory.
-echo "vm.overcommit_memory = 1" >> /etc/sysctl.conf
-sysctl -p
-/etc/init.d/redis-server restart
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install -y --force-yes oracle-java7-installer rubygems ruby1.9.1-dev
 
 # Install and configure elasticsearch
-wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.1.deb -O /tmp/elasticsearch.deb
-dpkg -i /tmp/elasticsearch.deb
+wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-0.90.5.deb -O /tmp/elasticsearch.deb
+sudo dpkg -i /tmp/elasticsearch.deb
 rm /tmp/elasticsearch.deb
 
 # These configurations are for a large, 192GB Dell R720. You'll need to adjust
@@ -29,12 +22,12 @@ cp $ROOT/default/elasticsearch /etc/default/elasticsearch
 /etc/init.d/elasticsearch start
 
 # Logstash is just a jar and requires some additional configs
-LOGHOME=/etc/logstash
-mkdir $LOGHOME && pushd $LOGHOME
-wget https://logstash.objects.dreamhost.com/release/logstash-1.1.13-flatjar.jar -O logstash.jar
-cp $ROOT/conf/indexer.conf .
+LOGHOME=/opt/logstash
+sudo mkdir $LOGHOME && sudo chown -R ubuntu:ubuntu $LOGHOME && pushd $LOGHOME
+wget https://logstash.objects.dreamhost.com/release/logstash-1.2.2-flatjar.jar -O logstash.jar
+cp $ROOT/conf/logstash_server.conf .
 cp $ROOT/init/logstash.conf /etc/init/
-mkdir /var/lib/logstash # Required working directory for logstash
+sudo mkdir /var/lib/logstash && sudo chown -R /var/lib/logstash # Required working directory for logstash
 service logstash start
 popd
 
