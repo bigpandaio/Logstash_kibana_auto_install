@@ -26,8 +26,8 @@ LOGHOME=/opt/logstash
 sudo rm -rf LOGHOME
 sudo mkdir $LOGHOME
 pushd $LOGHOME
-wget http://logstash.objects.dreamhost.com/release/logstash-1.2.1-flatjar.jar -O logstash.jar
-cp $ROOT/conf/logstash-node.conf .
+sudo wget http://logstash.objects.dreamhost.com/release/logstash-1.2.1-flatjar.jar -O logstash.jar
+sudo cp $ROOT/conf/logstash-node.conf .
 sudo cp $ROOT/init/logstash.conf /etc/init/
 sudo mkdir /var/lib/logstash && sudo chown -R ubuntu:ubuntu /var/lib/logstash # Required working directory for logstash
 sudo service logstash start
