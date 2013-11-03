@@ -23,6 +23,7 @@ sudo /etc/init.d/elasticsearch start
 
 # Logstash is just a jar and requires some additional configs
 LOGHOME=/opt/logstash
+sudo rm -rf LOGHOME
 sudo mkdir $LOGHOME && sudo chown -R ubuntu:ubuntu $LOGHOME
 pushd $LOGHOME
 wget http://logstash.objects.dreamhost.com/release/logstash-1.2.1-flatjar.jar -O logstash.jar
@@ -34,28 +35,34 @@ popd
 
 # Install and configure the Kibana frontend
 pushd /opt/
-git clone --branch=kibana-ruby https://github.com/rashidkpc/Kibana.git
-pushd Kibana
-sed -i 's#KibanaHost =.*#KibanaHost = "0.0.0.0"#' KibanaConfig.rb
-sed -i 's#KibanaPort =.*#KibanaPort = 80#' KibanaConfig.rb
-gem install bundler
-bundle install
-sudo cp $ROOT/init/kibana.conf /etc/init/kibana.conf
-sudo service kibana start
+sudo rm -rf kibana
+sudo wget https://download.elasticsearch.org/kibana/kibana/kibana-3.0.0milestone4.tar.gz
+sudo tar zxf kibana-3.0.0milestone4.tar.gz
+sudo rm kibana-3.0.0milestone4.tar.gz
+sudo mv kibana-3.0.0milestone4 kibana & sudo chown -R ubuntu:ubuntu kibana
 popd
+
+# Install and configure Nginx (serves Kibana)
+sudo apt-get install nginx
+pushd /etc/nginx/sites-available
+sudo rm default
+cp $ROOT/etc/nginx/kibana .
+sudo ln -s /etc/nginx/sites-enabled/kibana /etc/nginx/sites-available/kibana
+sudo service nginx reload
+popd
+
 
 # Up the open FD limit for everyone
 echo "soft nofile 1000000" >> /etc/security/limits.conf
 echo "hard nofile 1000000" >> /etc/security/limits.conf
 
 cat - <<FINISHED
-Elasticsearch installation now complete. 
+Installation complete. 
 
 Services running:
 
-  Logstash indexer
+  Logstash UDP Server
   Elasticsearch
-  Redis
   Kibana
 
 Kibana is listening on port 80.
