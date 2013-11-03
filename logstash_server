@@ -26,9 +26,9 @@ LOGHOME=/opt/logstash
 sudo mkdir $LOGHOME && sudo chown -R ubuntu:ubuntu $LOGHOME && pushd $LOGHOME
 wget http://logstash.objects.dreamhost.com/release/logstash-1.2.1-flatjar.jar -O logstash.jar
 cp $ROOT/conf/logstash_server.conf .
-sudo cp $ROOT/init/logstash.conf /etc/init/ && sudo chown ubuntu:ubuntu /etc/init/logstash.conf
+sudo cp $ROOT/init/logstash.conf /etc/init/
 sudo mkdir /var/lib/logstash && sudo chown -R ubuntu:ubuntu /var/lib/logstash # Required working directory for logstash
-service logstash start
+sudo service logstash start
 popd
 
 # Install and configure the Kibana frontend
@@ -40,7 +40,7 @@ sed -i 's#KibanaPort =.*#KibanaPort = 80#' KibanaConfig.rb
 gem install bundler
 bundle install
 sudo cp $ROOT/init/kibana.conf /etc/init/kibana.conf
-service kibana start
+sudo service kibana start
 popd
 
 # Up the open FD limit for everyone
