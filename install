@@ -24,7 +24,7 @@ sudo /etc/init.d/elasticsearch start
 # Logstash is just a jar and requires some additional configs
 LOGHOME=/opt/logstash
 if [ -e $LOGHOME ]; then
-	sudo rm -rf LOGHOME	
+	sudo rm -rf $LOGHOME	
 fi
 sudo mkdir $LOGHOME
 pushd $LOGHOME
