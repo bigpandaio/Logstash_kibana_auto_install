@@ -23,19 +23,23 @@ sudo /etc/init.d/elasticsearch start
 
 # Logstash is just a jar and requires some additional configs
 LOGHOME=/opt/logstash
-sudo rm -rf LOGHOME
+if [ -e $LOGHOME ]; then
+	sudo rm -rf LOGHOME	
+fi
 sudo mkdir $LOGHOME
 pushd $LOGHOME
 sudo wget http://logstash.objects.dreamhost.com/release/logstash-1.2.1-flatjar.jar -O logstash.jar
 sudo cp $ROOT/conf/logstash-node.conf .
 sudo cp $ROOT/init/logstash.conf /etc/init/
-sudo mkdir /var/lib/logstash && sudo chown -R ubuntu:ubuntu /var/lib/logstash # Required working directory for logstash
+sudo mkdir /var/lib/logstash # Required working directory for logstash
 sudo service logstash start
 popd
 
 # Install and configure the Kibana frontend
 pushd /opt/
-sudo rm -rf kibana
+if [ -e kibana ]; then
+	sudo rm -rf LOGHOME	
+fi
 sudo wget sudo wget http://download.elasticsearch.org/kibana/kibana/kibana-latest.zip
 sudo unzip kibana-latest.zip
 sudo rm kibana-latest.zip
@@ -44,7 +48,10 @@ popd
 
 # Install and configure Nginx (serves Kibana)
 pushd /etc/nginx/sites-available
-sudo rm default
+if [ -e default ]; then
+	sudo rm default
+fi
+
 sudo cp $ROOT/etc/nginx/kibana .
 sudo ln -s /etc/nginx/sites-available/kibana /etc/nginx/sites-enabled/kibana
 sudo service nginx reload
