@@ -19,15 +19,15 @@ rm /tmp/elasticsearch.deb
 # them for use on any smaller systems.
 cp $ROOT/etc/elasticsearch/elasticsearch.yml .
 cp $ROOT/default/elasticsearch /etc/default/elasticsearch
-/etc/init.d/elasticsearch start
+sudo /etc/init.d/elasticsearch start
 
 # Logstash is just a jar and requires some additional configs
 LOGHOME=/opt/logstash
 sudo mkdir $LOGHOME && sudo chown -R ubuntu:ubuntu $LOGHOME && pushd $LOGHOME
-wget https://logstash.objects.dreamhost.com/release/logstash-1.2.2-flatjar.jar -O logstash.jar
+wget http://logstash.objects.dreamhost.com/release/logstash-1.2.1-flatjar.jar -O logstash.jar
 cp $ROOT/conf/logstash_server.conf .
-cp $ROOT/init/logstash.conf /etc/init/
-sudo mkdir /var/lib/logstash && sudo chown -R /var/lib/logstash # Required working directory for logstash
+sudo cp $ROOT/init/logstash.conf /etc/init/ && sudo chown ubuntu:ubuntu /etc/init/logstash.conf
+sudo mkdir /var/lib/logstash && sudo chown -R ubuntu:ubuntu /var/lib/logstash # Required working directory for logstash
 service logstash start
 popd
 
@@ -39,7 +39,7 @@ sed -i 's#KibanaHost =.*#KibanaHost = "0.0.0.0"#' KibanaConfig.rb
 sed -i 's#KibanaPort =.*#KibanaPort = 80#' KibanaConfig.rb
 gem install bundler
 bundle install
-cp $ROOT/init/kibana.conf /etc/init/kibana.conf
+sudo cp $ROOT/init/kibana.conf /etc/init/kibana.conf
 service kibana start
 popd
 
