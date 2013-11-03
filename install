@@ -40,7 +40,7 @@ pushd /opt/
 if [ -e kibana ]; then
 	sudo rm -rf LOGHOME	
 fi
-sudo wget sudo wget http://download.elasticsearch.org/kibana/kibana/kibana-latest.zip
+sudo wget http://download.elasticsearch.org/kibana/kibana/kibana-latest.zip
 sudo unzip kibana-latest.zip
 sudo rm kibana-latest.zip
 sudo mv kibana-latest kibana
